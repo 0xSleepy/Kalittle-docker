@@ -24,4 +24,4 @@ You can use the contenair with differents options.
 
     * Install VcXsrv 
     * Set the DISPLAY env variable in the contenair. (The format of the display variable is [host]:<display>[.screen])
-        $ export DISPLAY=
+            $ export DISPLAY=

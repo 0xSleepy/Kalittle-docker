@@ -29,6 +29,6 @@ You can use the contenair with differents options.
    * Install VcXsrv 
    * For run GUI app from docker you need to get the IP of your windows host and set the DISPLAY env variable in the dockerfile. (The format of the display variable is [host]:<display>[.screen])
                 
-        export DISPLAY=YOUR-IP=0.0
+           export DISPLAY=YOUR-IP=0.0
         
     

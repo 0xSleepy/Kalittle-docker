@@ -16,17 +16,19 @@ You can use the contenair with differents options.
 
         docker run --rm -it --cap-add=NET_ADMIN --device=/net/tun --sysctl net.ipv6.conf.all.disable_ipv6=0 --name Kalittle /bin/zsh
    
- - Use -p flag for expose port. (The format of the -p command is [host port]:[container port]) 
+2. Use -p flag for expose port. (The format of the -p command is [host port]:[container port]) 
 
         docker run --rm -it -p 9001 --name kalittle /bin/zsh
     
-2. Share directory from host machine and the contenair.
+3. Share directory from host machine and the contenair.
 
         docker run --rm -it -v /path:/kalittle --name kalittle /bin/zsh
 
-3. Run GUI app in docker container on windows host.
+4. Run GUI app from docker container on windows host.
 
     * Install VcXsrv 
     * For run GUI app from docker you need to get the IP of your windows host and set the DISPLAY env variable in the dockerfile. (The format of the display variable is [host]:<display>[.screen])
-
+        - At the end of the dockerfile
+                export DISPLAY=YOUR-IP=0.0
+        
     

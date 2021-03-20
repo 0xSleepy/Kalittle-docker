@@ -16,7 +16,7 @@ You can use the contenair with differents options.
     
     * docker run --rm -it --cap-add=NET_ADMIN --device=/net/tun --sysctl net.ipv6.conf.all.disable_ipv6=0 --name Kalittle /bin/zsh
    
-   - Use -p flag for expose port. (The format of the -p command is [host port]:[container port]) 
+ - Use -p flag for expose port. (The format of the -p command is [host port]:[container port]) 
     * docker run --rm -it -p 9001 --name kalittle /bin/zsh
     
 2. Share directory from host machine and the contenair.

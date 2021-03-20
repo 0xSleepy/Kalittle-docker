@@ -1,9 +1,8 @@
 FROM kalilinux/kali-rolling:latest as baseline
 
-RUN apt update -y && apt upgrade -y && \
-    DEBIAN_FRONTEND="noninteractive" apt install -y tzdata
+RUN apt-get update -y && apt-get upgrade -y && DEBIAN_FRONTEND="noninteractive" apt-get install -y tzdata
 
-RUN apt update && apt install -y \
+RUN apt-get update && apt-get install -y \
     nmap \
     nikto \
     curl \
@@ -52,7 +51,9 @@ RUN apt update && apt install -y \
     amass \
     sqlite3 \
     ldap-utils \   
-    ruby-full \
+    ruby-full && \
+    DEBIAN_FRONTEND=noninteractive apt install -y php && \
+    apt-get update -y
 
 RUN python3 -m pip install --upgrade pip
 
@@ -60,7 +61,7 @@ FROM baseline as builder
 
 RUN \
     # Install oh-my-zsh
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended && \
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended && \
     sed -i '1i export LC_CTYPE="C.UTF-8"' /root/.zshrc && \
     sed -i '2i export LC_ALL="C.UTF-8"' /root/.zshrc && \
     sed -i '3i export LANG="C.UTF-8"' /root/.zshrc && \
@@ -72,16 +73,36 @@ RUN \
     sed -i '78i autoload -U compinit && compinit' /root/.zshrc
 
 # Python dependencies
-COPY requirements_pip.txt /tmp
+COPY requirements.txt /tmp
 RUN \
-    pip install -r /tmp/requirements_pip.txt
+    pip install -r /tmp/requirements.txt
+
+# Misc tools
+WORKDIR /tmp
+RUN \
+    wget -q https://dl.google.com/go/go1.16.2.linux-amd64.tar.gz -O goInstaller.tar.gz && \
+    tar -C /usr/local -zxf goInstaller.tar.gz 
+ENV GOROOT "/usr/local/go"
+ENV GOPATH "/root/go"
+ENV PATH "$PATH:$GOPATH/bin:$GOROOT/bin"
+
+# Node
+RUN \
+    curl -sL https://deb.nodesource.com/setup_14.x | bash && \
+    apt install nodejs -y && \
+# AWS-CLI
+    curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awsInstaller.zip && \
+    unzip awsInstaller.zip && \
+    ./aws/install
 
 # PortScanning
 RUN mkdir /temp
+
 # Rustscan
 WORKDIR /temp
 RUN wget --quiet https://github.com/RustScan/RustScan/releases/download/2.0.1/rustscan_2.0.1_amd64.deb && \
-    dpkg -i rustscan_2.0.1_amd64.deb
+    dpkg -i rustscan_2.0.1_amd64.deb && \
+    rm -f rustscan_2.0.1_amd64.deb
 
 # WORDLIST
 FROM baseline as wordlist
@@ -90,10 +111,10 @@ WORKDIR /temp
 # Download wordlists
 RUN \
     git clone --depth 1 https://github.com/xmendez/wfuzz.git && \
-    git clone --depth 1 https://github.com/danielmiessler/SecLists.git && \
     git clone --depth 1 https://github.com/fuzzdb-project/fuzzdb.git && \
-    git clone --depth 1 https://github.com/daviddias/node-dirbuster.git && \
     git clone --depth 1 https://github.com/v0re/dirb.git && \
+    git clone --depth 1 https://github.com/danielmiessler/SecLists.git && \
+    git clone --depth 1 https://github.com/daviddias/node-dirbuster.git && \
     curl -L -o rockyou.txt https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt && \
     curl -L -o all.txt https://gist.githubusercontent.com/jhaddix/86a06c5dc309d08580a018c66354a056/raw/96f4e51d96b2203f19f6381c8c545b278eaa0837/all.txt && \
     curl -L -o fuzz.txt https://raw.githubusercontent.com/Bo0oM/fuzz.txt/master/fuzz.txt
@@ -102,31 +123,31 @@ RUN \
 FROM builder as builder1
 COPY --from=wordlist /temp/ /tools/wordlist/
 
-# OS ENUMERATION
+# ENUMERATION
 FROM baseline as osEnumeration
 RUN mkdir /temp
 WORKDIR /temp
 
-# Download htbenum
+# htbenum
 RUN git clone --depth 1 https://github.com/SolomonSklash/htbenum.git
 WORKDIR /temp/htbenum
 RUN \
     chmod +x htbenum.sh && \
     ./htbenum.sh -u
 
-# Download linux smart enumeration
+# linux smart enumeration
 WORKDIR /temp
 RUN git clone --depth 1 https://github.com/diego-treitos/linux-smart-enumeration.git
 WORKDIR /temp/linux-smart-enumeration
 RUN chmod +x lse.sh
 
-# Download linenum
+#  linenum
 WORKDIR /temp
 RUN git clone --depth 1 https://github.com/rebootuser/LinEnum.git
 WORKDIR /temp/LinEnum
 RUN chmod +x LinEnum.sh
 
-# Download PEASS - Privilege Escalation Awesome Scripts SUITE
+# PEASS - Privilege Escalation Awesome Scripts SUITE
 WORKDIR /temp
 RUN \
     mkdir -p /temp/peass
@@ -138,12 +159,12 @@ RUN \
     wget -q https://raw.githubusercontent.com/carlospolop/privilege-escalation-awesome-scripts-suite/master/winPEAS/winPEASbat/winPEAS.bat && \
     wget -q https://raw.githubusercontent.com/carlospolop/privilege-escalation-awesome-scripts-suite/master/linPEAS/linpeas.sh
 
-# OS ENUMERATION
+#  ENUMERATION
 FROM builder1 as builder2
 COPY --from=osEnumeration /temp/ /tools/osEnumeration/
 WORKDIR /tools/osEnumeration
 
 
 # Change workdir
-ENV DISPLAY=192.168.1.7:0.0
+ENV DISPLAY=YOUR-IP:0.0
 WORKDIR /

@@ -12,7 +12,7 @@ A Kali-Linux dockerfile.
 
 You can use the contenair with differents options.
 
-1. Run the contenair to acces on some CTF VPN. yeah some pewpew.
+1. Run the contenair to acces on some CTF VPN. yeah some pewpew you know.
     
         docker run --rm -it --cap-add=NET_ADMIN --device=/net/tun --sysctl net.ipv6.conf.all.disable_ipv6=0 --name Kalittle /bin/zsh
 
@@ -24,6 +24,5 @@ You can use the contenair with differents options.
 
     * Install VcXsrv 
     * For run GUI app from docker you need to get the IP of your windows host and set the DISPLAY env variable in the dockerfile. (The format of the display variable is [host]:<display>[.screen])
-
 
     

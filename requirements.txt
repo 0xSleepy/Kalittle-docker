@@ -1,0 +1,14 @@
+pipenv
+py-altdns
+dnspython
+wfuzz
+ldapdomaindump
+impacket
+hashid
+droopescan
+spyse.py
+argparse
+tld
+pycryptodomex
+wafw00f
+pyyaml

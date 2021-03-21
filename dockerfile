@@ -1,4 +1,4 @@
-FROM kalilinux/kali-rolling:latest as baseline
+FROM kalilinux/kali-rolling:latest as baselayer
 
 RUN apt-get update -y && apt-get upgrade -y && DEBIAN_FRONTEND="noninteractive" apt-get install -y tzdata
 
@@ -57,7 +57,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN python3 -m pip install --upgrade pip
 
-FROM baseline as builder
+FROM baselayer as builder
 
 RUN \
     # Install oh-my-zsh
@@ -105,7 +105,7 @@ RUN wget --quiet https://github.com/RustScan/RustScan/releases/download/2.0.1/ru
     rm -f rustscan_2.0.1_amd64.deb
 
 # WORDLIST
-FROM baseline as wordlist
+FROM baselayer as wordlist
 WORKDIR /temp
 
 # Download wordlists
@@ -124,7 +124,7 @@ FROM builder as builder1
 COPY --from=wordlist /temp/ /tools/wordlist/
 
 # ENUMERATION
-FROM baseline as osEnumeration
+FROM baselayer as osEnumeration
 RUN mkdir /temp
 WORKDIR /temp
 

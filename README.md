@@ -1,5 +1,5 @@
 # Kalittle-docker
-A Kali-Linux dockerfile. You customize the dockerfile for your own use.
+A Kali-Linux dockerfile. You can customize the dockerfile for your own use.
 
 ## Usage
     

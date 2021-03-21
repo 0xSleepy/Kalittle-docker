@@ -56,7 +56,6 @@ RUN apt-get update && apt-get install -y \
     apt-get update -y
 
 RUN python3 -m pip install --upgrade pip
-
 FROM baselayer as builder
 
 RUN \

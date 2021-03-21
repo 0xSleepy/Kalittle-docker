@@ -8,5 +8,5 @@ pycryptodomex
 wafw00f
 pyyaml
 argparse
-pipenv
 dnspython
+pipenv

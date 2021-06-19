@@ -165,5 +165,5 @@ WORKDIR /tools/osEnumeration
 
 
 # Change workdir
-ENV DISPLAY=YOUR-IP:0.0
+#ENV DISPLAY=YOUR-IP:0.0
 WORKDIR /
